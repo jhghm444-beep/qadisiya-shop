@@ -22,25 +22,30 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.5'
+          flutter-version: '3.19.0'
           channel: stable
-          cache: true
 
-      - name: Flutter doctor
-        run: flutter doctor -v
+      - name: Extract Flutter project
+        run: |
+          mkdir flutter_project
+          unzip -q qadisiya_shop_complete.zip -d flutter_project
+
+      - name: Find Flutter project
+        run: |
+          PROJECT_DIR=$(find flutter_project -name pubspec.yaml -type f -print -quit | xargs dirname)
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "Flutter project found at: $PROJECT_DIR"
 
       - name: Get dependencies
         run: flutter pub get
-
-      - name: Clean
-        run: flutter clean
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Build APK
-        run: flutter build apk --release -v
+        run: flutter build apk --release
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Upload APK
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: qadisiya-shop-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/app-release.apk
