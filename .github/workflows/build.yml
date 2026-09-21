@@ -33,13 +33,26 @@ jobs:
       - name: Find Flutter project
         run: |
           PROJECT_DIR=$(find flutter_project -name pubspec.yaml -type f -print -quit | xargs dirname)
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           echo "Flutter project found at: $PROJECT_DIR"
+
+      - name: Find Gradle wrapper
+        run: |
+          GRADLE_FILE=$(find "$PROJECT_DIR" -name gradle-wrapper.properties -type f -print -quit)
+
+          if [ -z "$GRADLE_FILE" ]; then
+            echo "ERROR: gradle-wrapper.properties not found"
+            find "$PROJECT_DIR/android" -maxdepth 5 -type f | sort
+            exit 1
+          fi
+
+          echo "GRADLE_FILE=$GRADLE_FILE" >> "$GITHUB_ENV"
+          echo "Gradle wrapper found at: $GRADLE_FILE"
 
       - name: Fix Gradle version
         run: |
-          sed -i 's#^distributionUrl=.*#distributionUrl=https://services.gradle.org/distributions/gradle-8.9-all.zip#' "$PROJECT_DIR/android/gradle/wrapper/gradle-wrapper.properties"
-          cat "$PROJECT_DIR/android/gradle/wrapper/gradle-wrapper.properties"
+          sed -i 's#^distributionUrl=.*#distributionUrl=https://services.gradle.org/distributions/gradle-8.9-all.zip#' "$GRADLE_FILE"
+          cat "$GRADLE_FILE"
 
       - name: Get dependencies
         run: flutter pub get
