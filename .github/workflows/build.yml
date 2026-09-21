@@ -32,14 +32,27 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Extract Flutter project
+              - name: Extract Flutter project
         run: |
-          rm -rf flutter_project
-          mkdir flutter_project
-          unzip -q qadisya_shop_complete.zip -d flutter_project
+          echo "Searching for ZIP files..."
+          find . -type f -iname "*.zip" -print
 
-          echo "Files after extraction:"
-          find flutter_project -maxdepth 3 -type f | head -50
+          ZIP_FILE=$(find . -type f -iname "*.zip" -print -quit)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ERROR: No ZIP file found in repository"
+            exit 1
+          fi
+
+          echo "Using ZIP: $ZIP_FILE"
+
+          rm -rf flutter_project
+          mkdir -p flutter_project
+
+          unzip -q "$ZIP_FILE" -d flutter_project
+
+          echo "Extraction completed"
+          find flutter_project -maxdepth 3 -type f | head -100
 
       - name: Find Flutter project
         run: |
