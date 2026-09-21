@@ -38,7 +38,7 @@ jobs:
 
       - name: Fix Gradle version
         run: |
-          sed -i 's#distributionUrl=.*#distributionUrl=https\://services.gradle.org/distributions/gradle-8.9-all.zip#' "$PROJECT_DIR/android/gradle/wrapper/gradle-wrapper.properties"
+          sed -i 's#^distributionUrl=.*#distributionUrl=https://services.gradle.org/distributions/gradle-8.9-all.zip#' "$PROJECT_DIR/android/gradle/wrapper/gradle-wrapper.properties"
           cat "$PROJECT_DIR/android/gradle/wrapper/gradle-wrapper.properties"
 
       - name: Get dependencies
