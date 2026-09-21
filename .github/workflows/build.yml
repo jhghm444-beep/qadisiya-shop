@@ -33,7 +33,7 @@ jobs:
       - name: Extract Flutter project
         run: |
           mkdir flutter_project
-          unzip -q qadisiya_shop_complete.zip -d flutter_project
+          unzip -q qadisya_shop_complete.zip -d flutter_project
 
       - name: Find Flutter project
         run: |
@@ -41,15 +41,14 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           echo "Flutter project found at: $PROJECT_DIR"
 
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: ${{ env.PROJECT_DIR }}
+
       - name: Create Gradle wrapper
         run: |
           cd "$PROJECT_DIR/android"
           gradle wrapper --gradle-version 8.9
-          chmod +x gradlew
-
-      - name: Get dependencies
-        run: flutter pub get
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Build APK
         run: flutter build apk --release
