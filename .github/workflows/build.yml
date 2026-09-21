@@ -25,6 +25,11 @@ jobs:
           flutter-version: '3.19.0'
           channel: stable
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
       - name: Extract Flutter project
         run: |
           mkdir flutter_project
@@ -36,23 +41,11 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           echo "Flutter project found at: $PROJECT_DIR"
 
-      - name: Find Gradle wrapper
+      - name: Create Gradle wrapper
         run: |
-          GRADLE_FILE=$(find "$PROJECT_DIR" -name gradle-wrapper.properties -type f -print -quit)
-
-          if [ -z "$GRADLE_FILE" ]; then
-            echo "ERROR: gradle-wrapper.properties not found"
-            find "$PROJECT_DIR/android" -maxdepth 5 -type f | sort
-            exit 1
-          fi
-
-          echo "GRADLE_FILE=$GRADLE_FILE" >> "$GITHUB_ENV"
-          echo "Gradle wrapper found at: $GRADLE_FILE"
-
-      - name: Fix Gradle version
-        run: |
-          sed -i 's#^distributionUrl=.*#distributionUrl=https://services.gradle.org/distributions/gradle-8.9-all.zip#' "$GRADLE_FILE"
-          cat "$GRADLE_FILE"
+          cd "$PROJECT_DIR/android"
+          gradle wrapper --gradle-version 8.9
+          chmod +x gradlew
 
       - name: Get dependencies
         run: flutter pub get
