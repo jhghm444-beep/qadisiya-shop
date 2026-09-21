@@ -36,6 +36,11 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           echo "Flutter project found at: $PROJECT_DIR"
 
+      - name: Fix Gradle version
+        run: |
+          sed -i 's#distributionUrl=.*#distributionUrl=https\://services.gradle.org/distributions/gradle-8.9-all.zip#' "$PROJECT_DIR/android/gradle/wrapper/gradle-wrapper.properties"
+          cat "$PROJECT_DIR/android/gradle/wrapper/gradle-wrapper.properties"
+
       - name: Get dependencies
         run: flutter pub get
         working-directory: ${{ env.PROJECT_DIR }}
