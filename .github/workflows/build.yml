@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,6 +25,7 @@ jobs:
         with:
           flutter-version: '3.19.0'
           channel: stable
+          cache: true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -32,12 +34,22 @@ jobs:
 
       - name: Extract Flutter project
         run: |
+          rm -rf flutter_project
           mkdir flutter_project
           unzip -q qadisya_shop_complete.zip -d flutter_project
+
+          echo "Files after extraction:"
+          find flutter_project -maxdepth 3 -type f | head -50
 
       - name: Find Flutter project
         run: |
           PROJECT_DIR=$(find flutter_project -name pubspec.yaml -type f -print -quit | xargs dirname)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "ERROR: pubspec.yaml not found!"
+            exit 1
+          fi
+
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           echo "Flutter project found at: $PROJECT_DIR"
 
@@ -59,3 +71,4 @@ jobs:
         with:
           name: qadisiya-shop-apk
           path: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
